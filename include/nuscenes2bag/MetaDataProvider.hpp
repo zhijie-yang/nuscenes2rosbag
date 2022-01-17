@@ -27,6 +27,8 @@ public:
     const Token& sceneToken) const = 0;
   virtual CalibratedSensorName getSensorName(
     const Token& sensorToken) const = 0;
+  virtual std::vector<ImuData> getImuData(
+    const fs::path& inPath) const = 0;
 };
 
 }

@@ -44,6 +44,13 @@ struct CalibratedSensorInfo {
     boost::optional<IntrinsicsMatrix> cameraIntrinsics;
 };
 
+struct ImuData {
+    double linear_accel[3];
+    double q[4];
+    double rotation_rate[3];
+    TimeStamp utime;
+};
+
 struct CalibratedSensorName {
     Token token;
     std::string name;

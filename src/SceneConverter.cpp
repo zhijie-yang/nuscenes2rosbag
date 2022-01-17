@@ -7,6 +7,7 @@
 #include "nuscenes2bag/LidarDirectoryConverter.hpp"
 #include "nuscenes2bag/LidarDirectoryConverterXYZIR.hpp"
 #include "nuscenes2bag/RadarDirectoryConverter.hpp"
+#include "nuscenes2bag/ImuDirectoryConverter.hpp"
 
 #include <array>
 #include <iostream>
@@ -92,11 +93,36 @@ SceneConverter::run(const fs::path& inPath,
   outBag.open(bagName, rosbag::bagmode::Write);
 
   auto sensorInfos = metaDataProvider.getSceneCalibratedSensorInfo(sceneToken);
+  auto sceneInfoOpt = metaDataProvider.getSceneInfo(sceneToken);
+  std::cout << "Processing IMU data" << std::endl;
+  if (sceneInfoOpt) {
+    std::cout << "Got scene exist" << std::endl;
+    auto sceneName = sceneInfoOpt.value().name;
+    fs::path imuPath = inPath / "can_bus" / (sceneName + "_ms_imu.json");
+    std::cout << "Got imu json path:" << imuPath << std::endl;
+    convertImuDatas(outBag, imuPath);
+  }
+  std::cout << "End processing IMU data" << std::endl;
   convertEgoPoseInfos(outBag, sensorInfos);
   convertSampleDatas(outBag, inPath, fileProgress);
 
   outBag.close();
 }
+
+void
+SceneConverter::convertImuDatas(rosbag::Bag& outBag, const fs::path &inPath)
+{
+  std::cout << "Retrieving IMU data" << std::endl;
+  auto imuDatas = metaDataProvider.getImuData(inPath);
+  std::cout << "End retrieving IMU data" << std::endl;
+  auto topicName = "/imu";
+  std::cout << "Writing IMU msgs" << std::endl;
+  for (const auto& imuData: imuDatas) {
+    auto msg = readImuFile(imuData);
+    writeMsg(topicName, "imu", imuData.utime, outBag, msg);
+  }
+}
+
 
 void
 SceneConverter::convertSampleDatas(rosbag::Bag& outBag,
@@ -129,8 +155,8 @@ SceneConverter::convertSampleDatas(rosbag::Bag& outBag,
       auto topicName = sensorName;
 
       // PointCloud format:
-      auto msg = readLidarFile(sampleFilePath); // x,y,z,intensity
-      // auto msg = readLidarFileXYZIR(sampleFilePath); // x,y,z,intensity,ring
+      // auto msg = readLidarFile(sampleFilePath); // x,y,z,intensity
+      auto msg = readLidarFileXYZIR(sampleFilePath); // x,y,z,intensity,ring
 
       writeMsg(topicName, sensorName, sampleData.timeStamp, outBag, msg);
 

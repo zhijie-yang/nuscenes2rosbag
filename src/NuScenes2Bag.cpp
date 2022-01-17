@@ -161,7 +161,7 @@ NuScenes2Bag::convertDirectory(const fs::path& inDatasetPath,
               << static_cast<int>(fileProgress.getProgressPercentage() * 100)
               << "% [" << fileProgress.processedFiles << "/"
               << fileProgress.toProcessFiles << "]" << std::endl;
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    std::this_thread::sleep_for(std::chrono::milliseconds(10000));
   }
 
 #endif

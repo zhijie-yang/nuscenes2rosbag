@@ -55,6 +55,7 @@ set(SRCS
     src/LidarDirectoryConverter.cpp
     src/LidarDirectoryConverterXYZIR.cpp
     src/RadarDirectoryConverter.cpp
+    src/ImuDirectoryConverter.cpp
     src/NuScenes2Bag.cpp
     src/FileProgress.cpp
     src/MetaDataReader.cpp

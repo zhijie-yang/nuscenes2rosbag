@@ -90,6 +90,7 @@ readLidarFile(const fs::path& filePath)
   cloud.is_bigendian = false;
   cloud.point_step = sizeof(float) * 4; // Length of each point in bytes
   cloud.height = 1;
+  cloud.is_dense = true;
 
   try {
     std::ifstream fin(filePath.string(), std::ios::binary);

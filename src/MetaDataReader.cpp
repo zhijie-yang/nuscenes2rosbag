@@ -173,6 +173,29 @@ MetaDataReader::loadSampleDataInfos(const fs::path& filePath)
   return sample2SampleData;
 }
 
+std::vector<ImuData>
+MetaDataReader::loadImuData(const fs::path& filePath)
+{
+  std::cout << "Loading IMU data from json file" << std::endl;
+  auto imuDataJsons = slurpJsonFile(filePath);
+  std::vector<ImuData> imuDatas;
+
+  std::cout << "Unerializing IMU data" << std::endl;
+  for (const auto& imuDataJson : imuDataJsons) {
+    auto linear_accel = imuDataJson["linear_accel"];
+    auto q = imuDataJson["q"];
+    auto rotation_rate = imuDataJson["rotation_rate"];
+    imuDatas.push_back(ImuData{
+        { linear_accel[0], linear_accel[1], linear_accel[2] },
+        { q[0], q[1], q[2], q[3] },
+        { rotation_rate[0], rotation_rate[1], rotation_rate[2] },
+        imuDataJson["utime"]
+    });
+  }
+
+  return imuDatas;
+}
+
 EgoPoseInfo
 egoPoseJson2EgoPoseInfo(const json::json& egoPoseJson)
 {
@@ -308,6 +331,12 @@ MetaDataReader::getSceneSampleData(const Token& sceneToken) const
   }
 
   return sampleDataInfos;
+}
+
+std::vector<ImuData>
+MetaDataReader::getImuData(const fs::path& inPath) const
+{
+  return loadImuData(inPath);
 }
 
 std::vector<EgoPoseInfo>

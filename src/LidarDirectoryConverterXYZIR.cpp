@@ -1,5 +1,6 @@
 #include "nuscenes2bag/LidarDirectoryConverterXYZIR.hpp"
 #include "nuscenes2bag/utils.hpp"
+#include <cmath>
 #include <exception>
 
 using namespace sensor_msgs;
@@ -69,6 +70,9 @@ readBinaryPcdFileXYZIR(std::ifstream& fin)
   std::vector<float> fileValues;
   float f;
   while (fin.read(reinterpret_cast<char*>(&f), sizeof(float))) {
+    if (f == NAN) {
+      continue;
+    }
     fileValues.push_back(f);
   }
 
@@ -84,6 +88,7 @@ readLidarFileXYZIR(const fs::path& filePath)
   cloud.is_bigendian = false;
   cloud.point_step = sizeof(float) * 5; // Length of each point in bytes
   cloud.height = 1;
+  cloud.is_dense = true;
 
   try {
     std::ifstream fin(filePath.string(), std::ios::binary);

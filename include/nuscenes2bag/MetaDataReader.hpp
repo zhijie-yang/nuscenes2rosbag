@@ -45,6 +45,8 @@ public:
   getSceneCalibratedSensorInfo(const Token &sceneToken) const override;
   CalibratedSensorName
   getSensorName(const Token &sensorToken) const override;
+  std::vector<ImuData>
+  getImuData(const fs::path& inPath) const override;
 
   boost::optional<SceneInfo>
   getSceneInfoByNumber(const uint32_t sceneNumber) const override;
@@ -64,6 +66,8 @@ private:
   loadCalibratedSensorInfo(const fs::path &filePath);
   static std::map<Token, CalibratedSensorName>
   loadCalibratedSensorNames(const fs::path &filePath);
+  static std::vector<ImuData>
+  loadImuData(const fs::path& filePath);
 
   std::vector<SceneInfo> scenes;
   std::map<Token, std::vector<SampleInfo>> scene2Samples;
